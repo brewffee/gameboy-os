@@ -1,0 +1,156 @@
+@font-face {
+    font-family: '04b03';
+    src: url(04B_03__.TTF) format('truetype');
+}
+
+* {
+    font-family: '04b03';
+    user-select: none;
+    image-rendering: pixelated;
+}
+
+body {
+    cursor: url(cursors/default.png), auto;
+    height: 100vh;
+    margin: 0;
+}
+
+.wcon /* Test Window */ {
+    width: 456px;
+    height: 256px;
+    
+    position: absolute;
+
+}
+
+
+.titlebar /* Test Titlebar */ {
+    width: 100%;
+    height: 22px;
+    background-color: #382843;
+}
+
+.titlebar-body {
+    width: 100%; 
+    height: 100%;
+    background-color: #382843;
+    color: #c7c6c6;
+    position: relative;
+    top: 2px;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+}
+
+.titlebar-body > img {
+    width: 14px;
+    height: 14px;
+    margin: 0 4px 0 -2px;
+}
+
+.titlebar-body > span {
+    margin-top: -2px;
+    text-shadow: 2px 2px 0px #000;
+    position: relatIve;
+    top: 0px;
+}
+
+
+.titlebar-title { width: 100%; }
+.titlebar-buttons { display: flex; flex-direction: row; }
+.titlebar-btn { height: 22px; width: 24px; position: relative; top:-4px; right: -4px; }
+
+
+.titlebar.focused {
+    background-color: #382843;
+}
+
+.content /* Test Window Content */ {
+    width: calc(100% - 4px);
+    height: calc(100% - 36px);
+    background-color: #7c6d80;
+    border: 2px solid #7c6d80;
+}
+
+.content-body {
+    width: 100%; 
+    height: 100%;
+    background-color: #7c6d80;
+    color: #c7c6c6;
+    text-shadow: 2px 2px 0px #382843;
+    padding: 6px 0;
+    overflow-y: scroll;
+}
+
+.content.focused {
+    background-color: #7c6d80;
+    border: 2px solid ;
+}
+
+.deco-t {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.deco-h {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 2px;
+}
+
+.deco-mid {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: calc(100% - 4px);
+}
+
+.deco-i {
+    position: relative;
+    image-rendering: pixelated;
+}
+
+/* titlebar decoration elements */
+.t-tl { height: 6px; width: 6px; top: -2px; left: -2px; }
+.t-m { height: 6px; width: 100%; top: -2px; left: -2px; margin-right: -6px; }
+.t-tr { height: 6px; width: 6px; top: -2px; right: -2px; }
+
+.t-ml { height: 100%; width: 6px; top: 2px; left: -2px; }
+.t-mr { height: 100%; width: 6px; top: 2px; right: -2px; }
+
+.t-bl { height: 2px; width: 6px; bottom: -2px; left: -2px; }
+.t-bm { height: 2px; width: 100%; bottom: -2px; left: -2px; margin-right: -6px; }
+.t-br { height: 2px; width: 6px; bottom: -2px; right: -2px; }
+
+/* window decoration elements (FOR PLAIN WINDOWS ONLY) */
+.w-tl { height: 6px; width: 6px; top: 0px; left: -4px; }
+.w-m { height: 6px; width: 100%; top: 0px; left: -2px; margin: 0px -6px 0 -2px;}
+.w-tr { height: 6px; width: 10px; top: 0px; right: -4px; }
+
+.w-ml { height: 100%; width: 10px; top: 2px; left: -4px; }
+.w-mr { height: 100%; width: 10px; top: 2px; right: -4px; }
+
+.w-bl { height: 10px; width: 8px; bottom: -2px; left: -4px; }
+.w-bm { height: 8px; width: 100%; bottom: -4px; left: -2px; margin: 0px -6px 0 -2px; }
+.w-br { height: 10px; width: 10px; bottom: -2px; right: -4px; }
+
+
+/* drag handle cursors (use custom later :3c) */
+.window-draghandle-topL { cursor: nw-resize; }
+.window-draghandle-top { cursor: n-resize; }
+.window-draghandle-topR { cursor: ne-resize; }
+
+.window-draghandle-left { cursor: w-resize; }
+.window-draghandle-right { cursor: e-resize; }
+
+.window-draghandle-bottomL { cursor: sw-resize; }
+.window-draghandle-bottom { cursor: s-resize; }
+.window-draghandle-bottomR { cursor: se-resize; }
+
+
+/* taskbar elements */
+.taskbar-l { position: absolute; left: 106px; width: 4px; height: 24px; z-index: 1001; }
+.taskbar-m {  position: absolute; right: 0px; width: 92%; height: 24px; z-index: 1000;  }
+
