@@ -1,5 +1,7 @@
 const $ = (x) => document.querySelector(`#${x}`);
 
+let curBtn = null;
+
 // Log the classlist of the element we're hovering over
 document.addEventListener('mouseover', (e) => {
     $("dbg-li").innerText = `Selected: #${e.target.id}, [${e.target.classList}]`;
@@ -68,6 +70,18 @@ const setFocus = (x) => {
 
 }
 
+// onWindowEvent
+// For now, just get the information on load
+window.onload = () => {
+    let wins = document.getElementsByClassName('wcon');
+
+    let wcount = Array.from(wins).length;
+
+    $('dbg-win').innerText = `Workspace: (${wcount}), `
+
+    Array.from(wins).forEach(x => $('dbg-win').innerText += '[' + x.id + ']')
+}
+
 // Stop the right click menu from appearing
 document.oncontextmenu = function() {
     return false;
@@ -124,11 +138,27 @@ document.addEventListener('mousedown', (e) => {
     } else if (e.target.classList.contains('desktop')) {
         $("dbg").innerText = 'Focused on desktop, removing focus from all windows';
         defocusAll();
+    } else if (e.target.parentElement.classList.contains('taskbar-btn-h') && e.target.classList.contains('taskbar-btn')) {
+        $("dbg").innerText = 'Focused on a taskbar button, removing focus from all windows';
+        defocusAll();
+
+        curBtn = e.target.parentElement;
+        $('dbg').innerText += "\nSelected a taskbar-btn! Trying to handle button event";
+
+        // handleButton();
+
+        Array.from(e.target.parentElement.children).forEach(x => {
+            if (!x.style.background.includes('-l.png')) {
+                x.style.background = x.style.background.replace('.png', '-l.png');
+            }
+
+            if (x.innerText != "") {
+                x.style.textShadow = "2px 2px 0px #382843"
+                console.log('first');
+            }
+        });
     } else if (e.target.classList.contains('taskspace-obj')) {
         $("dbg").innerText = 'Focused on taskbar free space, removing focus from all windows';
-        defocusAll();
-    } else if (e.target.classList.contains('taskbar-btn')) {
-        $("dbg").innerText = 'Focused on a taskbar button, removing focus from all windows';
         defocusAll();
     }
 });
@@ -337,6 +367,23 @@ document.addEventListener('mousemove', (e) => {
 
         }
     }
+
+    // if we're on a button instead of dragging a window
+    // NOT NEEDED FOR BUTTONS !!!!
+    /*if (e.buttons === 1 && curBtn != null) {
+        // deselect the button if we lose its focus
+        if (e.target.parentElement != curBtn) {
+            $('dbg').innerText += 'Lost focus of current button! Deselecting';
+            
+            Array.from(curBtn.children).forEach(x => {
+                if (x.style.background.includes('-l.png')) {
+                    x.style.background = x.style.background.replace('-l.png', '.png');
+                }
+            });
+
+            curBtn = null;
+        }
+    }*/
 });
 
 document.addEventListener('mouseup', (e) => {
@@ -358,6 +405,27 @@ document.addEventListener('mouseup', (e) => {
     curW = null;
     curHandle = null;
     setCursor("default");
+
+    // if we stop holding a button
+    if (curBtn != null) {
+        $('dbg').innerText += "\nLost focus of curBtn! Deselecting...";
+
+        console.log(curBtn);
+        if (curBtn.classList.contains('taskstart-obj')) {console.log('start menu')}
+
+        Array.from(curBtn.children).forEach(x => {
+            if (x.style.background.includes('-l.png')) {
+                x.style.background = x.style.background.replace('-l.png', '.png');
+            }
+
+            if (x.innerText != "") {
+                x.style.textShadow = "2px 2px 0px #000"
+                console.log('setting');
+            }
+        });
+
+        curBtn = null;
+    }
 });
 
 // Capture doubleclicks

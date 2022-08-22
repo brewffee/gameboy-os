@@ -9,7 +9,7 @@
     </head>
     <body class="desktop" id="0" style="background:#7c6d80;">
 
-        <div id="a" class="wcon window-host" style="top: 16px; left: 16px; z-index: 100; height: 180px; width: 720px;">
+        <div id="Log" class="wcon window-host" style="top: 16px; left: 16px; z-index: 100; height: 180px; width: 720px;">
             <div class="titlebar titlebar-obj">
                 <div class="deco-t titlebar-obj">
                     <div class="deco-h titlebar-obj">
@@ -57,11 +57,10 @@
                         <div class="content-body content-obj" style="width: 100%; height: 100%;">
                             <span id="dbg-li">Selected: #, []</span>
                             <br />
+                            <span id="dbg-win">Workspace:</span>
+                            <br />
                             <span id="dbg">:3c</span>
-                    
                         </div>
-
-                        
 
                         <div class="w-mr deco-i content-obj  drag-obj window-draghandle-right" style="background: url(window/w-mr.png) repeat-y;"></div>
                     </div>
@@ -74,7 +73,7 @@
             </div>
         </div>
 
-        <div id="b" class="wcon window-host" style="top: 256;left: 360;">
+        <div id="Test_Window" class="wcon window-host" style="top: 256;left: 250;">
             <div class="titlebar titlebar-obj">
                 <div class="deco-t titlebar-obj">
                     <div class="deco-h titlebar-obj">
@@ -120,7 +119,7 @@
                         
                         <!-- actual content in this div :3c -->
                         <div class="content-body content-obj" style="width: 100%; height: 100%;">
-                            <span class="dragHandle">meow :3c</span>
+                            <span class="dragHandle">howdy</span>
                         </div>
 
                         <div class="w-mr deco-i content-obj  drag-obj window-draghandle-right" style="background: url(window/w-mr.png) repeat-y;"></div>
@@ -136,10 +135,10 @@
 
 
         <div class="taskbar taskbar-obj" style="height: 24px; width: 100%; position:absolute; bottom: 0px;display: flex;">
-            <div class="taskstart taskbar-btn taskbar-obj" style="z-index:1001;display: flex;align-items: center;">
+            <div class="taskstart taskstart-obj taskbar-btn-h taskbar-obj" style="z-index:1001;display: flex;align-items: center;">
                 <div class="taskstart-obj taskbar-btn taskbar-obj" style="z-index:1001;width: 20px;height:24px;background: url(taskstart.png) no-repeat;"></div>
-                <div class="taskbar-m taskbar-obj taskbar-btn  taskspace-obj" style="z-index:1000;position:absolute;left:12px;background: url(taskm.png) repeat-x;"></div>
-                <span class="taskstart-obj taskstart-text taskbar-obj taskbar-btn" style="z-index:1001;margin-top:4px;margin-left:4px;text-shadow: 2px 2px 0px #000;color:#c7c7c7">Programs</span>
+                <div class="taskstart-obj taskbar-m taskbar-obj taskbar-btn" style="z-index:1000;position:absolute;left:12px;background: url(taskstart-m.png) repeat-x;width: 94px;"></div>
+                <span class="taskstart-obj taskstart-text taskbar-obj taskbar-btn" style="z-index:1001;margin-top:4px;padding-right:4px;margin-left:4px;text-shadow: 2px 2px 0px #000;color:#c7c7c7">Programs</span>
             </div>
             
             <div class="taskspace taskbar-obj" style="display:flex;">

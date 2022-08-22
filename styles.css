@@ -152,5 +152,5 @@ body {
 
 /* taskbar elements */
 .taskbar-l { position: absolute; left: 106px; width: 4px; height: 24px; z-index: 1001; }
-.taskbar-m {  position: absolute; right: 0px; width: 92%; height: 24px; z-index: 1000;  }
+.taskbar-m {  position: absolute; right: 0px; width: 98%; height: 24px; z-index: 1000;  }
 
