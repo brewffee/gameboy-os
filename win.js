@@ -1,6 +1,12 @@
 const $ = (x) => document.querySelector(`#${x}`);
 
-let curBtn = null;
+let mouseLTime = 0; // for mouse hold tracking
+let mouseRTime = 0; // ^
+
+let curBtn = null;  // for tracking selected button
+let curW = null;    // current window
+let lastActiveWindow = null; // if we need to go back to the last window
+let curHandle = null; // current drag handle
 
 // Log the classlist of the element we're hovering over
 document.addEventListener('mouseover', (e) => {
@@ -22,7 +28,6 @@ const defocusAll = () => {
 
     // For every .deco-i, we need to change the background image url to ${x}-l.png
     Array.from(document.getElementsByClassName('deco-i')).forEach(i => {
-        console.log(i.style.background);
         if (!i.style.background.includes('-l.png')) {
             i.style.background = i.style.background.replace('.png', '-l.png');
         }
@@ -82,15 +87,13 @@ window.onload = () => {
     Array.from(wins).forEach(x => $('dbg-win').innerText += '[' + x.id + ']')
 }
 
-// Stop the right click menu from appearing
+// Stop the right click menu from appearing ()
 document.oncontextmenu = function() {
     return false;
 }
 
 // Handle onmousedown events from js instead :(
 document.addEventListener('mousedown', (e) => {
-    console.log(e.target.classList);
-
     if (e.target.classList.contains('titlebar-obj')) { 
         let titlebar, window;
 
@@ -145,7 +148,10 @@ document.addEventListener('mousedown', (e) => {
         curBtn = e.target.parentElement;
         $('dbg').innerText += "\nSelected a taskbar-btn! Trying to handle button event";
 
-        // handleButton();
+        if (curW) {
+            // discard curW and move it to lastActiveWindow
+            lastActiveWindow = curW;
+        }
 
         Array.from(e.target.parentElement.children).forEach(x => {
             if (!x.style.background.includes('-l.png')) {
@@ -154,19 +160,41 @@ document.addEventListener('mousedown', (e) => {
 
             if (x.innerText != "") {
                 x.style.textShadow = "2px 2px 0px #382843"
-                console.log('first');
             }
         });
     } else if (e.target.classList.contains('taskspace-obj')) {
         $("dbg").innerText = 'Focused on taskbar free space, removing focus from all windows';
         defocusAll();
+    } else if (e.target.classList.contains('titlebar-btn')) {
+        $("dbg").innerText = 'Focused on a titlebar button, removing focus from all windows';
+        // focus the window that the button is in
+        let window = e.target.parentElement;
+        while (!window.classList.contains('window-host')) {
+            window = window.parentElement;
+        }
+
+        // get its titlebar
+        let titlebar = window.getElementsByClassName('titlebar')[0];
+
+        if (curW != window) {
+            defocusAll();
+            
+            // discard that window and focus the new one
+            setFocus(window);
+            setFocus(titlebar);
+        }
+
+        curBtn = e.target;
+        $('dbg').innerText += "\nSelected a titlebar-btn! Trying to handle button event";
+
+        // we're keeping focus on the window for now
+        // just light up the button
+        if (!curBtn.style.background.includes('-l.png')) {
+            curBtn.style.background = curBtn.style.background.replace('.png', '-l.png');
+        }
+
     }
 });
-
-let mouseLTime = 0; // for mouse hold tracking
-let mouseRTime = 0; // ^
-let curW = null;    // current window
-let curHandle = null; // current drag handle
 
 document.addEventListener('mousedown', (e) => {
     e.button === 0 ? mouseLTime = Date.now() : mouseRTime = Date.now();
@@ -198,10 +226,8 @@ document.addEventListener('mousedown', (e) => {
 });
 
 document.addEventListener('mousemove', (e) => {
-    console.log ("curW: " + curW);
-    if (e.buttons === 1 && curW != null && curHandle == null) {
-        // we've clearly established to the code that we're dragging a window; now
-        // give the user some feedback by changing the cursor
+    // either moving the window or resizing it
+    if (e.buttons === 1 && curW  && !curHandle) {
         setCursor("move");
 
         const { top, left } = curW.getBoundingClientRect();
@@ -212,26 +238,15 @@ document.addEventListener('mousemove', (e) => {
         // update the position of the window
         curW.style.top = `${top + movementY}px`;
         curW.style.left = `${left + movementX}px`;
-    } else if (e.buttons === 1 && curHandle != null && curW != null) {
-        // we're resizing a window here :)
-        console.log("resizing window");
-
+    } else if (e.buttons === 1 && curHandle && curW) {
         // get the current window
-        const { top, left, width, height, x, y } = curW.getBoundingClientRect();
-        const { movementX, movementY, pageX, pageY } = e;
-
-        console.log(curW.getBoundingClientRect());
-
-        let mouseDirV = 0; // 1 = up, 0 = down
-        let mouseDirH = 0; // 1 = left, 0 = right
-
-        console.log("mouse directions: " + mouseDirV + " " + mouseDirH, movementX, movementY);
+        const { top, left, width, height } = curW.getBoundingClientRect();
+        const { pageX, pageY } = e;
 
         const { style } = curW;
 
         // for top left resizing, subtract from the top and left pos values, as well as maintain width and height
         if (curHandle.classList.contains('window-draghandle-topL')) {
-            // set the body's cursor to the drag cursor
             setCursor("nw-resize");
             
             // update horizontal position if the window isnt gonna get any smaller
@@ -250,7 +265,6 @@ document.addEventListener('mousemove', (e) => {
 
         // for top resizing, subtract from the top pos value, and maintain the height 
         else if (curHandle.classList.contains('window-draghandle-top')) {
-            // set the body's cursor to the drag cursor
             setCursor("n-resize");
             
             // update vertical position if the window isnt gonna get any smaller
@@ -263,12 +277,10 @@ document.addEventListener('mousemove', (e) => {
 
         // for top right resizing, subtract from the top pos value, add to the width, and maintain the height
         else if (curHandle.classList.contains('window-draghandle-topR')) {
-            // set the body's cursor to the drag cursor
             setCursor("ne-resize");
 
             // calculate what px size we need, considering the offset of the window's position and current width
             const newWidth = pageX - left;
-            console.log(pageX, " should be equal to ", pageX - left);
             
             // update horizontal position if the window isnt gonna get any smaller
             if (!(newWidth <= 192)) {
@@ -285,7 +297,6 @@ document.addEventListener('mousemove', (e) => {
 
         // for left resizing, subtract from the left pos value, and maintain the width
         else if (curHandle.classList.contains('window-draghandle-left')) {
-            // set the body's cursor to the drag cursor
             setCursor("w-resize");
 
             // update horizontal position if the window isnt gonna get any smaller
@@ -298,7 +309,6 @@ document.addEventListener('mousemove', (e) => {
 
         // for right resizing, add to the width
         else if (curHandle.classList.contains('window-draghandle-right')) {
-            // set the body's cursor to the drag cursor
             setCursor("e-resize");
 
             // calculate what px size we need, considering the offset of the window's position and current width
@@ -313,7 +323,6 @@ document.addEventListener('mousemove', (e) => {
 
         // for bottom left resizing, subtract from left pos value, add to the height, and maintain the width
         else if (curHandle.classList.contains('window-draghandle-bottomL')) {
-            // set the body's cursor to the drag cursor
             setCursor("sw-resize"); 
 
             // update horizontal position if the window isnt gonna get any smaller
@@ -324,7 +333,6 @@ document.addEventListener('mousemove', (e) => {
 
             // calculate what px size we need, considering the offset of the window's position and current height
             const newHeight = pageY - top;
-            console.log(pageY, " should be equal to ", pageY - top);
 
             // update vertical position if the window isnt gonna get any smaller
             if (!(newHeight <= 64)) {
@@ -367,37 +375,20 @@ document.addEventListener('mousemove', (e) => {
 
         }
     }
-
-    // if we're on a button instead of dragging a window
-    // NOT NEEDED FOR BUTTONS !!!!
-    /*if (e.buttons === 1 && curBtn != null) {
-        // deselect the button if we lose its focus
-        if (e.target.parentElement != curBtn) {
-            $('dbg').innerText += 'Lost focus of current button! Deselecting';
-            
-            Array.from(curBtn.children).forEach(x => {
-                if (x.style.background.includes('-l.png')) {
-                    x.style.background = x.style.background.replace('-l.png', '.png');
-                }
-            });
-
-            curBtn = null;
-        }
-    }*/
 });
 
 document.addEventListener('mouseup', (e) => {
     if (e.button === 0) {
         if ((Date.now() - mouseLTime) > 80) {
-            $("dbg").innerText += `\nLeft mouse was held down for ${(Date.now() - mouseLTime) / 1000}s`;
+            //$("dbg").innerText += `\nLeft mouse was held down for ${(Date.now() - mouseLTime) / 1000}s`;
         } else {
-            $("dbg").innerText += `\nLeft mouse was clicked`;
+            //$("dbg").innerText += `\nLeft mouse was clicked`;
         }
     } else {
         if ((Date.now() - mouseRTime) > 80) {
-            $("dbg").innerText += `\nRight mouse was held down for ${(Date.now() - mouseRTime) / 1000}s`;
+            //$("dbg").innerText += `\nRight mouse was held down for ${(Date.now() - mouseRTime) / 1000}s`;
         } else {
-            $("dbg").innerText += `\nRight mouse was clicked`;
+            //$("dbg").innerText += `\nRight mouse was clicked`;
         }
     }
 
@@ -410,19 +401,40 @@ document.addEventListener('mouseup', (e) => {
     if (curBtn != null) {
         $('dbg').innerText += "\nLost focus of curBtn! Deselecting...";
 
-        console.log(curBtn);
-        if (curBtn.classList.contains('taskstart-obj')) {console.log('start menu')}
+        if (curBtn.classList.contains('taskstart-obj')) {
+            // createWindow('explorer-min', fp.special["Programs"]);
+            //
+            // fp = {
+            //     special: {
+            //         "Programs": { ... },
+            //         ... 
+            //     },
+            //     root: { ... },
+            //     ...
+            // }
+            //
+            // createWindow of type 'explorer' will open a window with the given path,
+            // and will set the window's title to the name of the current directory
 
-        Array.from(curBtn.children).forEach(x => {
-            if (x.style.background.includes('-l.png')) {
-                x.style.background = x.style.background.replace('-l.png', '.png');
-            }
+            $('dbg').innerText += "\n(NOT_IMPL) Creating window of type 'explorer-min' to open path: fp.special['Programs']";
+        }
 
-            if (x.innerText != "") {
-                x.style.textShadow = "2px 2px 0px #000"
-                console.log('setting');
+        if (curBtn.classList.contains('taskbar-btn-h')) {
+            Array.from(curBtn.children).forEach(x => {
+                if (x.style.background.includes('-l.png')) {
+                    x.style.background = x.style.background.replace('-l.png', '.png');
+                }
+
+                if (x.innerText != "") {
+                    x.style.textShadow = "2px 2px 0px #000"
+                }
+            });
+        } else if (curBtn.classList.contains('titlebar-btn')) {
+            if (curBtn.style.background.includes('-l.png')) {
+                curBtn.style.background = curBtn.style.background.replace('-l.png', '.png');
             }
-        });
+            $('dbg').innerText += "\n(NOT_IMPL) Titlebar action " + curBtn.id;
+        }
 
         curBtn = null;
     }
@@ -431,8 +443,8 @@ document.addEventListener('mouseup', (e) => {
 // Capture doubleclicks
 document.addEventListener('dblclick', (e) => {
     if (e.button === 0) {
-        $("dbg").innerText += `\nLeft mouse was doubleclicked`;
+        //$("dbg").innerText += `\nLeft mouse was doubleclicked`;
     } else {
-        $("dbg").innerText += `\nRight mouse was doubleclicked`;
+        //$("dbg").innerText += `\nRight mouse was doubleclicked`;
     }
 } );

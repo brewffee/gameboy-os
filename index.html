@@ -5,11 +5,13 @@
         <meta charset="utf-8">
         <link rel="stylesheet" href="styles.css">
         <script src="win.js"></script>
+        <script src="builder.js"></script>
         <title>wtop</title>
     </head>
     <body class="desktop" id="0" style="background:#7c6d80;">
+        <button onclick="createWindow('default', { title: 'test', size: '200x200', pos: '128,128', img: 'tesst.png', buttons: [1,2,3], html: '<span>real</span>' })">Create Window</button>
 
-        <div id="Log" class="wcon window-host" style="top: 16px; left: 16px; z-index: 100; height: 180px; width: 720px;">
+        <div id="Log" class="wcon window-host" style="top: 16px; left: 16px; z-index: 100; height: 180px; width: 812px;">
             <div class="titlebar titlebar-obj">
                 <div class="deco-t titlebar-obj">
                     <div class="deco-h titlebar-obj">
@@ -54,12 +56,12 @@
                         <div class="w-ml deco-i content-obj drag-obj window-draghandle-left" style="background: url(window/w-ml.png) repeat-y;"></div>
                         
                         <!-- actual content in this div :3c -->
-                        <div class="content-body content-obj" style="width: 100%; height: 100%;">
+                        <div class="content-body content-obj" style="background:#000000;padding-left: 8px;margin-left:-12px;">
                             <span id="dbg-li">Selected: #, []</span>
                             <br />
                             <span id="dbg-win">Workspace:</span>
                             <br />
-                            <span id="dbg">:3c</span>
+                            <span id="dbg" style="text-shadow:none;color:#7c6d80;">:3c</span>
                         </div>
 
                         <div class="w-mr deco-i content-obj  drag-obj window-draghandle-right" style="background: url(window/w-mr.png) repeat-y;"></div>
@@ -91,9 +93,9 @@
                             <span class="titlebar-title titlebar-obj">Test Window</span>
 
                             <div class="titlebar-buttons titlebar-obj">
-                                <div class="titlebar-btn titlebar-obj deco-i" style="background: url(min.png) no-repeat; background-size: cover;"></div>
-                                <div class="titlebar-btn titlebar-obj deco-i" style="background: url(max.png) no-repeat; background-size: cover;"></div>
-                                <div class="titlebar-btn titlebar-obj deco-i" style="background: url(x.png) no-repeat; background-size: cover;"></div>
+                                <div id="Test_Window_min" class="titlebar-btn deco-i" style="background: url(min.png) no-repeat; background-size: cover;"></div>
+                                <div id="Test_Window_max" class="titlebar-btn deco-i" style="background: url(max.png) no-repeat; background-size: cover;"></div>
+                                <div id="Test_Window_close" class="titlebar-btn deco-i" style="background: url(x.png) no-repeat; background-size: cover;"></div>
                             </div>
                         </div>
 
@@ -118,8 +120,8 @@
                         <div class="w-ml deco-i content-obj drag-obj window-draghandle-left" style="background: url(window/w-ml.png) repeat-y;"></div>
                         
                         <!-- actual content in this div :3c -->
-                        <div class="content-body content-obj" style="width: 100%; height: 100%;">
-                            <span class="dragHandle">howdy</span>
+                        <div class="content-body content-obj">
+                            <span>howdy</span>
                         </div>
 
                         <div class="w-mr deco-i content-obj  drag-obj window-draghandle-right" style="background: url(window/w-mr.png) repeat-y;"></div>
