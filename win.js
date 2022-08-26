@@ -8,6 +8,31 @@ let curW = null;    // current window
 let lastActiveWindow = null; // if we need to go back to the last window
 let curHandle = null; // current drag handle
 
+// we need to store every window and its order for the wm
+// use a map to store the windows and their order
+let winMap = new Map();
+// map structure
+// { pid: { window: <window>, order: x, title: string } }
+// { 1: { window: host, order: 0, title: 'Test Window' } }
+
+// getting from map gets NASTY
+// use this for now 
+const __getPid = (x) => {
+    console.log('getting pid for ' + x);
+    console.log(x);
+    return parseInt(x.getAttribute('pid'))
+    x.getAttribute('pid');
+}
+const __getAttr = (x) => {
+    //console.log(winMap);
+    let r = winMap.get(parseInt(x.getAttribute('pid')));
+    
+    return r;
+}
+
+let pid = 0; // for generating unique ids for every window
+pid = pid + 2; // we've initialized 2 windows in in the code, update to reflect this
+
 // Log the classlist of the element we're hovering over
 document.addEventListener('mouseover', (e) => {
     $("dbg-li").innerText = `Selected: #${e.target.id}, [${e.target.classList}]`;
@@ -17,74 +42,154 @@ const setCursor = (x) => {
     document.body.style.cursor = `url(cursors/${x}.png), auto`;
 }
 
-const defocusAll = () => {  
-    Array.from(document.getElementsByClassName('wcon')).forEach(x => x.style["z-index"] = 10);
-    //Array.from(document.getElementsByClassName('focused')).forEach(x => x.classList.remove('focused'));
+// take a new approach to focusing windows
+const focusWindow = (x) => {
+    // x can be a window or null
 
+    // Defocus the currently focused window
+    // ALL OF THIS CAN BE SHORTENED BY A TON !!! DO LATER WITH CUSTOM ELMS AND CSS AND ATTRIBS
+    //Array.from(document.getElementsByClassName('wcon')).forEach(x => x.style["z-index"] = 10);
     Array.from(document.getElementsByClassName('titlebar-title')).forEach(x => {
         // Remove " (focused)" from the titlebar title
         x.innerText = x.innerText.replace(/ \(focused\)/, "");
-    });
-
-    // For every .deco-i, we need to change the background image url to ${x}-l.png
+    })
     Array.from(document.getElementsByClassName('deco-i')).forEach(i => {
         if (!i.style.background.includes('-l.png')) {
             i.style.background = i.style.background.replace('.png', '-l.png');
         }
     });
-
-    // For every .titlebar-body and .titlebar, we need to force the bg color to #7c6d80
     Array.from(document.getElementsByClassName('titlebar-body')).forEach(x => {
         x.style.background = '#7c6d80';
     });    
-
     Array.from(document.getElementsByClassName('titlebar')).forEach(x => {
         x.style.background = '#7c6d80';
     });
 
-}
+    // move everyone in the map down 1
+    winMap.forEach((v, _k) => {
+        // 0 order = 1100 z-index
+        // 100 order = 1000 z-index
+        v.order = v.order + 1;
 
-window.onload = () => { defocusAll(); }
+        // subtract from 1100 to get the z-index
+        v.window.style["z-index"] = 1100 - v.order;
+    });
 
-const setFocus = (x) => {
-    //x.classList.add('focused');
-    x.parentElement.style["z-index"] = 100;
 
-    // If we're on a window-host class, find a child titlebar-title
+    if (x == null) {
+        // exit immediately, since there is no window to focus
+        return;
+    }
+    // -------------------------------------------------------------- defocusing done
+    // focus the new window
+    console.log('trying to focus ' + x.classList);
+    // if we're on a window-host class, find a child titlebar-title
+    // this wont be necessary after we move to custom elms and css and attrs btw
     if (x.classList.contains('window-host')) {
-        title = x.querySelector('.titlebar-title'); // should exist
+        title = x.querySelector('.titlebar-title');
         title.innerText += ' (focused)';
     }
 
-    // For every .deco-i, we need to change the background image url to ${x}.png, though we need to get to the host window first
-    let host = x;
-    while (!host.classList.contains('window-host')) {
-        host = host.parentElement;
-    }
-
-    // For every .deco-i, we need to change the background image url to ${x}.png
-    Array.from(host.getElementsByClassName('deco-i')).forEach(x => {
-        if (x.style.background.includes('-l.png')) {
-            x.style.background = x.style.background.replace('-l.png', '.png');
+    // change image for deco-i elms (should also be cleaned soon)
+    Array.from(x.getElementsByClassName('deco-i')).forEach(i => {
+        if (i.style.background.includes('-l.png')) {
+            i.style.background = i.style.background.replace('-l.png', '.png');
         }
     });
 
-    // Set the host's titlebar to the correct color
-    host.getElementsByClassName('titlebar-body')[0].style.background = '#382843';
-    host.getElementsByClassName('titlebar')[0].style.background = '#382843';
+    // fx colors (again, css rules will make this 100% unnecessary)
+    x.getElementsByClassName('titlebar-body')[0].style.background = '#382843';
+    x.getElementsByClassName('titlebar')[0].style.background = '#382843';
 
+    // reflect the new position in the window map
+    // since we're focusing a window, its order is 0
+    winMap.set(__getPid(x), { window: x, order: 0, title: x.id });
+    console.log(__getPid(x), { window: x, order: 0, title: x.id });
+
+
+    // remember, 0 order = 1100 z-index, 100 order = 1000 z-index
+    x.style["z-index"] = 1100; // since its 0
+
+    // let em know
+    onWindowEvent('focus', x);
 }
 
-// onWindowEvent
-// For now, just get the information on load
+// initialize the default windows (test only)
 window.onload = () => {
-    let wins = document.getElementsByClassName('wcon');
+    // we already have 2 windows on load, called Log and Test_Window
+    // { pid: { window: <window>, order: x, title: string } }
+    winMap.set(1, { window: $('Log'), order: 0, title: 'Log' });
+    winMap.set(2, { window: $('Test_Window'), order: 2, title: 'Test Window' });
 
-    let wcount = Array.from(wins).length;
+    focusWindow(winMap.get(1).window);
+}
 
-    $('dbg-win').innerText = `Workspace: (${wcount}), `
 
-    Array.from(wins).forEach(x => $('dbg-win').innerText += '[' + x.id + ']')
+// any changes to the window's order or a window's state needs to be reflected here
+// type could be : 'create', 'destroy', 'focus', 'move', 'resize'
+//
+// {
+//     type: 'create', 'destroy', 'focus', 'unfocus', 'move', 'resize'
+//
+//     2nd arg could be ,,,,
+//     create (opt): { type: string, args: {} }
+//     destroy (opt): (window object)
+//     focus (opt): (window object)
+//     move (opt): (window object)
+//     resize (opt): (window object)
+// }
+//
+// onWindowEvent('create', { type: 'create', args: {}});
+onWindowEvent = (type, e) => {
+    //console.log(`onWindowEvent::${type} ` + __getPid(e), { window: e.window, order: 0, title: e.type });
+    switch (type) {
+        case 'create':
+            // handled elsewhere, can just log
+            $('dbg').innerText = `\n${type} ${e.type}`;
+            break;
+        case 'destroy':
+            // move the other windows up, since the last deleted window was likely 0
+            Array.from(document.getElementsByClassName('wcon')).forEach(x => {
+                console.log(__getPid(x), winMap);
+                if (winMap.get(__getPid(x)).order > 0) {
+                    // as i was saying before,,, eugh
+                    winMap.set(__getPid(x), { window: x, order: __getAttr(x).order - 1, title: __getAttr(x).title });
+                }
+
+                // also fix the z-index
+                x.style["z-index"] = 1100 - __getAttr(x).order;
+            });
+
+            // delete the element from the map and the body
+            winMap.delete(__getPid(e));
+            document.body.removeChild(e);
+            break;
+        case 'focus':
+            // setfocus is handled elsewhere, before we move it here, just log
+            $('dbg').innerText += `\n${e.id} focused (onWindowEvent:focus)`;
+            break;
+        case 'defocus':
+            // just log 
+            console.log(`${e.id} defocused (onWindowEvent:defocus)`);
+        case 'move':
+            // move doesnt impact anything, just log
+            $('dbg').innerText += `\n${e.id} moving!! (onWindowEvent:move)`;
+            break;
+        case 'resize':
+            // resize doesnt impact anything, just log
+            $('dbg').innerText += `${e.id} resizing!! (onWindowEvent:resize)`;
+            break;
+    }
+
+    // update the window map, but preserve the order
+    let winStr = `${winMap.size} Windows: `;
+    
+    Array.from(document.getElementsByClassName('wcon')).forEach(x => {
+        winStr += `<${__getPid(x)}>[${__getAttr(x).order}] ${__getAttr(x).title}, `; 
+    });
+    winStr = winStr.replace(/, $/, "");
+    $("dbg-win").innerText = winStr;
+    console.log(winMap);
 }
 
 // Stop the right click menu from appearing ()
@@ -94,33 +199,7 @@ document.oncontextmenu = function() {
 
 // Handle onmousedown events from js instead :(
 document.addEventListener('mousedown', (e) => {
-    if (e.target.classList.contains('titlebar-obj')) { 
-        let titlebar, window;
-
-        // Loop until we find the source titlebar element
-        titlebar = e.target;
-        while (!titlebar.classList.contains('titlebar')) {
-            titlebar = titlebar.parentElement;
-        }
-
-        // Loop until we find the source window element
-        window = titlebar.parentElement;
-        while (!window.classList.contains('window-host')) {
-            window = window.parentElement;
-        }
-
-        if (e.button == 2) {
-            $("dbg").innerText = `Focused on titlebar of window ${window.id}, defocusing other windows`;
-            $("dbg").innerText += `\nOpening the context menu for the titlebar of window ${window.id}`;
-        } else {
-            $("dbg").innerText = `Focused on titlebar of window ${window.id}, defocusing other windows`;
-        }
-
-        // Switch focus to the current window
-        defocusAll();
-        setFocus(titlebar);
-        setFocus(window);        
-    } else if (e.target.classList.contains('content-obj')) {
+    if (e.target.classList.contains('content-obj') || e.target.classList.contains('titlebar-obj')) {
         let titlebar, window;
 
         // Loop until we find the source window element
@@ -129,29 +208,33 @@ document.addEventListener('mousedown', (e) => {
             window = window.parentElement;
         }
 
-        // Get that window's titlebar
+        // Get that window's titlebar (if we dont have one already)
         titlebar = window.getElementsByClassName('titlebar')[0];
 
         $("dbg").innerText = `Focused on window ${window.id}, defocusing other windows`;
 
         // Switch focus to the current window
-        defocusAll();
-        setFocus(window);
-        setFocus(titlebar);
+        // if we're already focused (ordrer: 0) then there isnt rlly any need to do anything
+
+        console.log(`windowis ${window}`);
+        if (__getAttr(window).order > 0) {
+            focusWindow(window);
+        }
+        
+        // if its a titlebar-obj, and we're using mouse2, note its context menu
+        if (e.button == 2 && e.target.classList.contains('titlebar-obj')) {
+            $('dbg').innerText = `Titlebar context menu opened for ${window.id}`;
+        }        
     } else if (e.target.classList.contains('desktop')) {
-        $("dbg").innerText = 'Focused on desktop, removing focus from all windows';
-        defocusAll();
+        focusWindow(null);
     } else if (e.target.parentElement.classList.contains('taskbar-btn-h') && e.target.classList.contains('taskbar-btn')) {
         $("dbg").innerText = 'Focused on a taskbar button, removing focus from all windows';
-        defocusAll();
+        focusWindow(null);
 
         curBtn = e.target.parentElement;
         $('dbg').innerText += "\nSelected a taskbar-btn! Trying to handle button event";
 
-        if (curW) {
-            // discard curW and move it to lastActiveWindow
-            lastActiveWindow = curW;
-        }
+        // button action is actually handled in mouseup
 
         Array.from(e.target.parentElement.children).forEach(x => {
             if (!x.style.background.includes('-l.png')) {
@@ -164,7 +247,7 @@ document.addEventListener('mousedown', (e) => {
         });
     } else if (e.target.classList.contains('taskspace-obj')) {
         $("dbg").innerText = 'Focused on taskbar free space, removing focus from all windows';
-        defocusAll();
+        focusWindow(null);
     } else if (e.target.classList.contains('titlebar-btn')) {
         $("dbg").innerText = 'Focused on a titlebar button, removing focus from all windows';
         // focus the window that the button is in
@@ -177,11 +260,7 @@ document.addEventListener('mousedown', (e) => {
         let titlebar = window.getElementsByClassName('titlebar')[0];
 
         if (curW != window) {
-            defocusAll();
-            
-            // discard that window and focus the new one
-            setFocus(window);
-            setFocus(titlebar);
+            focusWindow(window);
         }
 
         curBtn = e.target;
@@ -218,9 +297,7 @@ document.addEventListener('mousedown', (e) => {
         }
 
         // we have a drag object ??? focus that shit !!!
-        defocusAll();
-        setFocus(curW);
-        setFocus(curW.getElementsByClassName('titlebar')[0]);
+        focusWindow(curW);
 
     }
 });
@@ -433,7 +510,27 @@ document.addEventListener('mouseup', (e) => {
             if (curBtn.style.background.includes('-l.png')) {
                 curBtn.style.background = curBtn.style.background.replace('-l.png', '.png');
             }
-            $('dbg').innerText += "\n(NOT_IMPL) Titlebar action " + curBtn.id;
+
+            let btnAction = curBtn.getAttribute('action');
+            $('dbg').innerText += "\n(NOT_IMPL) Titlebar action " + btnAction;
+
+            switch (btnAction) {
+                case 'minimize':
+                    // not implemented
+                    break;
+                case 'maximize':
+                    // not implemented
+                    break;
+                case 'close':
+                    // get its window
+                    let win = curBtn.parentElement.parentElement;
+                    while (!win.classList.contains('window-host')) {
+                        win = win.parentElement;
+                    }
+
+                    onWindowEvent('destroy', win);
+                    break;
+            }
         }
 
         curBtn = null;
