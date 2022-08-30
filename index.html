@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta charset="utf-8">
         <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="new.css">
         <script src="win.js"></script>
         <script src="builder.js"></script>
         <title>wtop</title>
@@ -11,130 +12,20 @@
     <body class="desktop" id="0" style="background:#7c6d80;">
         <button onclick="createWindow('default', { title: 'test', size: '200x200', pos: '128,128', img: 'tesst.png', buttons: [1,2,3], html: '<span>real</span>' })">Create Window</button>
 
-        <div pid="1" id="Log" class="wcon window-host" style="top: 16px; left: 16px; z-index: 100; height: 180px; width: 812px;">
-            <div class="titlebar titlebar-obj">
-                <div class="deco-t titlebar-obj">
-                    <div class="deco-h titlebar-obj">
-                        <div class="t-tl deco-i drag-obj window-draghandle-topL" style="background: url(window/t-tl.png) no-repeat;"></div>
-                        <div class="t-m deco-i drag-obj window-draghandle-top" style="background: url(window/t-m.png) repeat-x;"></div>
-                        <div class="t-tr deco-i drag-obj window-draghandle-topR" style="background: url(window/t-tr.png) no-repeat;"></div>
-                    </div>
-
-                    <div class="deco-mid titlebar-obj">
-                        <div class="t-ml deco-i drag-obj window-draghandle-left" style="background: url(window/t-ml.png) repeat-y;"></div>
-
-                        <!-- actual titlebar content in this div :3c -->
-                        <div class="titlebar-body titlebar-obj">
-                            <!-- <img class="titlebar-obj" src="tesst.png" draggable="false">-->
-                            <span class="titlebar-title titlebar-obj">Log</span>
-
-                            <div class="titlebar-buttons titlebar-obj">
-                                <div class="titlebar-btn titlebar-obj deco-i" style="background: url(min.png) no-repeat; background-size: cover;"></div>
-                                <div class="titlebar-btn titlebar-obj deco-i" style="background: url(max.png) no-repeat; background-size: cover;"></div>
-                                <div class="titlebar-btn titlebar-obj deco-i" style="background: url(x.png) no-repeat; background-size: cover;"></div>
-                            </div>
-                        </div>
-
-                        <div class="t-mr deco-i drag-obj window-draghandle-right" style="background: url(window/t-mr.png) repeat-y;"></div>
-                    </div>
-
-                   <div class="deco-h">
-                        <div class="t-bl deco-i drag-obj window-draghandle-left" style="background: url(window/t-bl.png) no-repeat;"></div>
-                        <div class="t-bm deco-i titlebar-obj" style="background: url(window/t-bm.png) repeat-x;"></div>
-                        <div class="t-br deco-i drag-obj window-draghandle-right" style="background: url(window/t-br.png) no-repeat;"></div>
-                    </div>
-                </div> 
+        <window pid="1" title="Log" active="true" style="top: 36px; left: 16px; z-index: 100; height: 180px; width: 812px;">
+            <titlebar> <!-- pos: 0x 0y, 100%w, 26h -->
+                <img src="tesst.png" />
+                <span>Log</span>
+            </titlebar>
+            <content> <!-- pos: 30x 0y, 100%w, 100% - 26h -->
+                <span>howdy</span>
+            </content>
+            <!-- NEVERMIND!!! use border image styling for these two, ez :3 -->
+            <div class="deco-borders"></div>
+            <div class="deco-corners"></div>
             </div>
-            <div class="content">
-                <div class="deco-t content-obj">
-                    <div class="deco-h">
-                        <div class="w-tl deco-i content-obj drag-obj window-draghandle-left" style="background: url(window/w-tl.png) no-repeat;"></div>
-                        <div class="w-m deco-i content-obj" style="background: url(window/w-m.png) repeat-x;"></div>
-                        <div class="w-tr deco-i content-obj drag-obj window-draghandle-right" style="background: url(window/w-tr.png) no-repeat;"></div>
-                    </div>
-                    <div class="deco-mid">
-                        <div class="w-ml deco-i content-obj drag-obj window-draghandle-left" style="background: url(window/w-ml.png) repeat-y;"></div>
-                        
-                        <!-- actual content in this div :3c -->
-                        <div class="content-body content-obj" style="background:#000000;padding-left: 8px;margin-left:-12px;">
-                            <span id="dbg-li">Selected: #, []</span>
-                            <br />
-                            <span id="dbg-win">Workspace:</span>
-                            <br />
-                            <span id="dbg" style="text-shadow:none;color:#7c6d80;">:3c</span>
-                        </div>
-
-                        <div class="w-mr deco-i content-obj  drag-obj window-draghandle-right" style="background: url(window/w-mr.png) repeat-y;"></div>
-                    </div>
-                    <div class="deco-h">
-                        <div class="w-bl deco-i content-obj drag-obj window-draghandle-bottomL" style="background: url(window/w-bl.png) no-repeat;"></div>
-                        <div class="w-bm deco-i content-obj drag-obj window-draghandle-bottom" style="background: url(window/w-bm.png) repeat-x;"></div>
-                        <div class="w-br deco-i content-obj drag-obj window-draghandle-bottomR" style="background: url(window/w-br.png) no-repeat;"></div>
-                    </div>    
-                </div>
-            </div>
-        </div>
-
-        <div pid="2" id="Test_Window" class="wcon window-host" style="top: 256;left: 250;">
-            <div class="titlebar titlebar-obj">
-                <div class="deco-t titlebar-obj">
-                    <div class="deco-h titlebar-obj">
-                        <div class="t-tl deco-i drag-obj window-draghandle-topL" style="background: url(window/t-tl.png) no-repeat;"></div>
-                        <div class="t-m deco-i drag-obj window-draghandle-top" style="background: url(window/t-m.png) repeat-x;"></div>
-                        <div class="t-tr deco-i drag-obj window-draghandle-topR" style="background: url(window/t-tr.png) no-repeat;"></div>
-                    </div>
-
-                    <div class="deco-mid titlebar-obj">
-                        <div class="t-ml deco-i drag-obj window-draghandle-left" style="background: url(window/t-ml.png) repeat-y;"></div>
-
-                        <!-- actual titlebar content in this div :3c -->
-                        <div class="titlebar-body titlebar-obj">
-                            <img src="tesst.png">
-                            <span class="titlebar-title titlebar-obj">Test Window</span>
-
-                            <div class="titlebar-buttons titlebar-obj">
-                                <div id="Test_Window_min" class="titlebar-btn deco-i" style="background: url(min.png) no-repeat; background-size: cover;"></div>
-                                <div id="Test_Window_max" class="titlebar-btn deco-i" style="background: url(max.png) no-repeat; background-size: cover;"></div>
-                                <div id="Test_Window_close" class="titlebar-btn deco-i" style="background: url(x.png) no-repeat; background-size: cover;"></div>
-                            </div>
-                        </div>
-
-                        <div class="t-mr deco-i drag-obj window-draghandle-right" style="background: url(window/t-mr.png) repeat-y;"></div>
-                    </div>
-
-                   <div class="deco-h">
-                        <div class="t-bl deco-i drag-obj window-draghandle-left" style="background: url(window/t-bl.png) no-repeat;"></div>
-                        <div class="t-bm deco-i titlebar-obj" style="background: url(window/t-bm.png) repeat-x;"></div>
-                        <div class="t-br deco-i drag-obj window-draghandle-right" style="background: url(window/t-br.png) no-repeat;"></div>
-                    </div>
-                </div> 
-            </div>
-            <div class="content">
-                <div class="deco-t content-obj">
-                    <div class="deco-h">
-                        <div class="w-tl deco-i content-obj drag-obj window-draghandle-left" style="background: url(window/w-tl.png) no-repeat;"></div>
-                        <div class="w-m deco-i content-obj" style="background: url(window/w-m.png) repeat-x;"></div>
-                        <div class="w-tr deco-i content-obj drag-obj window-draghandle-right" style="background: url(window/w-tr.png) no-repeat;"></div>
-                    </div>
-                    <div class="deco-mid">
-                        <div class="w-ml deco-i content-obj drag-obj window-draghandle-left" style="background: url(window/w-ml.png) repeat-y;"></div>
-                        
-                        <!-- actual content in this div :3c -->
-                        <div class="content-body content-obj">
-                            <span>howdy</span>
-                        </div>
-
-                        <div class="w-mr deco-i content-obj  drag-obj window-draghandle-right" style="background: url(window/w-mr.png) repeat-y;"></div>
-                    </div>
-                    <div class="deco-h">
-                        <div class="w-bl deco-i content-obj drag-obj window-draghandle-bottomL" style="background: url(window/w-bl.png) no-repeat;"></div>
-                        <div class="w-bm deco-i content-obj drag-obj window-draghandle-bottom" style="background: url(window/w-bm.png) repeat-x;"></div>
-                        <div class="w-br deco-i content-obj drag-obj window-draghandle-bottomR" style="background: url(window/w-br.png) no-repeat;"></div>
-                    </div>    
-                </div>
-            </div>
-        </div>
-
+        </window>
+       
 
         <div class="taskbar taskbar-obj" style="height: 24px; width: 100%; position:absolute; bottom: 0px;display: flex;">
             <div class="taskstart taskstart-obj taskbar-btn-h taskbar-obj" style="z-index:1001;display: flex;align-items: center;">
