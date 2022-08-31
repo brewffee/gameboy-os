@@ -14,8 +14,8 @@
 
         <window pid="1" title="Log" active="true" style="top: 36px; left: 16px; z-index: 100; height: 180px; width: 812px;">
             <titlebar> <!-- pos: 0x 0y, 100%w, 26h -->
-                <img src="tesst.png" />
-                <span>Log</span>
+                <img class="titlebar-icon" src="tesst.png" />
+                <span class="titlebar-title">Log</span>
                 <div class="titlebar-buttons">
                     <button class="titlebar-button" type="minimize"></button>
                     <button class="titlebar-button" type="maximize"></button>
@@ -24,6 +24,24 @@
             </titlebar>
             <content> <!-- pos: 30x 0y, 100%w, 100% - 26h -->
                 <span id="log">howdy</span>
+                <span id="focused">null</span>
+            </content>
+        </window>
+
+
+        <window pid="2" title="LogTwo" active="true" style="top:128px; left: 36px; z-index: 98; height: 180px; width: 812px;">
+            <titlebar> <!-- pos: 0x 0y, 100%w, 26h -->
+                <img class="titlebar-icon" src="tesst.png" />
+                <span class="titlebar-title">Log</span>
+                <div class="titlebar-buttons">
+                    <button class="titlebar-button" type="minimize"></button>
+                    <button class="titlebar-button" type="maximize"></button>
+                    <button class="titlebar-button" type="close"></button>
+                </div>
+            </titlebar>
+            <content> <!-- pos: 30x 0y, 100%w, 100% - 26h -->
+                <span id="log">howdy</span>
+                <span id="focused">null</span>
             </content>
         </window>
 
