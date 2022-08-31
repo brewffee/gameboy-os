@@ -17,21 +17,10 @@ let winMap = new Map();
 
 // getting from map gets NASTY
 // use this for now 
-const __getPid = (x) => {
-    console.log('getting pid for ' + x);
-    console.log(x);
-    return parseInt(x.getAttribute('pid'))
-    x.getAttribute('pid');
-}
-const __getAttr = (x) => {
-    //console.log(winMap);
-    let r = winMap.get(parseInt(x.getAttribute('pid')));
-    
-    return r;
-}
+const __getPid = (x) => parseInt(x.getAttribute('pid'))
+const __getAttr = (x) => winMap.get(parseInt(x.getAttribute('pid')));
 
 let pid = 0; // for generating unique ids for every window
-pid = pid + 2; // we've initialized 2 windows in in the code, update to reflect this
 
 // Log the classlist of the element we're hovering over
 document.addEventListener('mouseover', (e) => {
@@ -113,17 +102,6 @@ const focusWindow = (x) => {
     // let em know
     onWindowEvent('focus', x);
 }
-
-// initialize the default windows (test only)
-window.onload = () => {
-    // we already have 2 windows on load, called Log and Test_Window
-    // { pid: { window: <window>, order: x, title: string } }
-    winMap.set(1, { window: $('Log'), order: 0, title: 'Log' });
-    winMap.set(2, { window: $('Test_Window'), order: 2, title: 'Test Window' });
-
-    focusWindow(winMap.get(1).window);
-}
-
 
 // any changes to the window's order or a window's state needs to be reflected here
 // type could be : 'create', 'destroy', 'focus', 'move', 'resize'
@@ -536,12 +514,3 @@ document.addEventListener('mouseup', (e) => {
         curBtn = null;
     }
 });
-
-// Capture doubleclicks
-document.addEventListener('dblclick', (e) => {
-    if (e.button === 0) {
-        //$("dbg").innerText += `\nLeft mouse was doubleclicked`;
-    } else {
-        //$("dbg").innerText += `\nRight mouse was doubleclicked`;
-    }
-} );

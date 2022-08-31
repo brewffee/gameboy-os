@@ -17,95 +17,95 @@ body {
 
 window {
     position: absolute;
+
 }
 
 titlebar {
     position: relative;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
+    
+    display: flex;
+    width: 100%; height: 14px;
 
+    background-color: #382843;
+    
+    /* never fucking mind it just works here somehow */
+    border-image: url(winnew/titlebar.png) 3 3 3 3 repeat repeat;
+    border-style: solid;
+    border-width: 6;
+    border-radius: 12px; /* hides bg corner overlap :3 */
+}
+
+titlebar > img /* window icon */ {
+    display: block;
+    width: 14px; height: 14px;
+
+    margin-right: 6px;    
+}
+
+titlebar > span /* window title */ {
+    margin-top: -3px;
     display: block;
 
+    color: #c7c6c6;
+    text-shadow: 2px 2px 0px #000;
+}
+
+.titlebar-buttons {
+    display: flex;
     width: 100%;
-    height: 22px;
-    padding: 6px;
-    background-color: #dca8ff;
+
+    position: relative;
+    top: -4px;
+    right: -2px;
+
+    flex-direction: row;
+    justify-content: flex-end;
 }
 
-titlebar > img {
-    width: 14px;
-    height: 14px;
-    margin: 0 4px 0 -2px;
+.titlebar-button {
+    display: block;
+    width: 24px; height: 22px;
+    padding: 0;
+
+    margin-left: 0px;
+
+    border: none;
 }
 
-window {background:red;}
-.decoration{
-width:calc(100% + 4px);
-height:calc(100% + 4px);
-position:relative;
-top:-24px;
-left:-4px;
-
-border-image: url(b.png) 3 3 3 3 repeat repeat;
-border-style: solid;
+.titlebar-button[type="close"] {
+    background: url(x.png) no-repeat;
+    background-size: cover;
 }
 
+.titlebar-button[type="minimize"] {
+    background: url(min.png) no-repeat;
+    background-size: cover;
+}
 
+.titlebar-button[type="maximize"] {
+    background: url(max.png) no-repeat;
+    background-size: cover;
+}
 
-/* we can start setting the corner images */
-deco[obj="titlebar"] > drag[type="top-left"] {
-    /* coords */
-    position: absolute;
+.titlebar-button[type="restore"] {
+    background: url(restore.png) no-repeat;
+    background-size: cover;
+}
+
+content {
+    position: relative;
     top: 0; left: 0;
-
-    /* image data */
-    width: 6px; /* 2x more than src */
-    height: 6px;
-    background-image: url(window/t-tl.png);
-}
-
-/* and if its active */
-window[active="true"] > .decoration > deco[obj="titlebar"] > drag[type="top-left"] {
-    /* this could vary if the user has a different theme */
-    /* for now, keep this as default behavior */
-    background-image: url(window/t-tl-l.png);
-}
-
-/* after setting the corners, we also need to set border images for the deco elm */
-deco[obj="titlebar"] {
-    border-top-image: 
-}
-
-
-
-
-.deco-l {
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    width: 12px;
-    height: calc(100% + 4px);
-    background-color: green;
-    z-index:2;
-}
-
-.deco-l > .deco-tb { /* Titlebar decorator container */
-    background-color: purple;
-    width: 100%;
-    height: 36px;
-}
-
-.deco-l > .deco-win { /* Window decorator container */
-    background-color: #382843;
-    width: 100%;
-    height: calc(100% - 36px);
-}
-
-drag {
-    background-color: orange;
-    z-index:4;
-    height: 4px;
-    width: 4px;
+    
+    display: block;
+    width: calc(100% - 8px); height: 100%;
+    
+    background-color: #7c6d80;
+    
+    border-image: url(winnew/content.png) 5 repeat repeat;
+    border-style: solid;
+    border-width: 10;
+    border-radius: 12px;
 }
 
 /*

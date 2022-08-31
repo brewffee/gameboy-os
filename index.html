@@ -1,12 +1,12 @@
 <html>
     <head>
-        <!-- force viewport width to be quite small -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta charset="utf-8">
         <link rel="stylesheet" href="styles.css">
         <link rel="stylesheet" href="new.css">
-        <script src="win.js"></script>
-        <script src="builder.js"></script>
+        <!-- <script src="win.js"></script> -->
+        <!-- <script src="builder.js"></script> -->
+        <script src="new.js"></script>
         <title>wtop</title>
     </head>
     <body class="desktop" id="0" style="background:#7c6d80;">
@@ -16,16 +16,16 @@
             <titlebar> <!-- pos: 0x 0y, 100%w, 26h -->
                 <img src="tesst.png" />
                 <span>Log</span>
+                <div class="titlebar-buttons">
+                    <button class="titlebar-button" type="minimize"></button>
+                    <button class="titlebar-button" type="maximize"></button>
+                    <button class="titlebar-button" type="close"></button>
+                </div>
             </titlebar>
             <content> <!-- pos: 30x 0y, 100%w, 100% - 26h -->
-                <span>howdy</span>
+                <span id="log">howdy</span>
             </content>
-            <!-- NEVERMIND!!! use border image styling for these two, ez :3 -->
-            <div class="deco-borders"></div>
-            <div class="deco-corners"></div>
-            </div>
         </window>
-       
 
         <div class="taskbar taskbar-obj" style="height: 24px; width: 100%; position:absolute; bottom: 0px;display: flex;">
             <div class="taskstart taskstart-obj taskbar-btn-h taskbar-obj" style="z-index:1001;display: flex;align-items: center;">
