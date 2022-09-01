@@ -2,16 +2,10 @@ const $ = (selector) => document.querySelector(selector);
 const __getName = (elm) => elm.getAttribute('name');
 const __getPid = (elm) => elm.getAttribute('pid');
 
-
 document.oncontextmenu = () => false;
 
-
-
-document.addEventListener('mouseover', (e) => {
-    $('#log').innerText = `${e.target.tagName}: #${e.target.id}, [${e.target.className}]`;
-});
-
 let focusedWindow = null; // if null, then we're focused on the desktop
+let canDragWindow = false; // check if we're allowed to drag the window
 
 // now we can make a window manager
 let winMap = new Map();
@@ -152,6 +146,10 @@ document.addEventListener('mousedown', (e) => {
                 titlebar = titlebar.parentElement;
             }
 
+            // if we're using lmb, we can enter drag mode
+            if (e.button === 0) {
+                canDragWindow = true; // for the mousemove event
+            }
             $('#tb').innerText = `\nTitlebar selected, mouse button: ${e.button}`;
         } else {
             $('#tb').innerText = ``;
@@ -172,8 +170,60 @@ document.addEventListener('mousedown', (e) => {
         const lastWindow = winMap.get(winMap.get('__order')[1]).obj;
         lastWindow.setAttribute('active', 'false');
     }
+});
 
+document.addEventListener('mousemove', (e) => {
+    // we'll need to add a check if its actually the resize state
+    // instead of the drag state
+    
+    // check if we're on the last 4 pixels of a window
+    // if we're on those pixels, we can set the cursor to resize (direction)
+    // if we are using lmb, we are definitely resizing, and not dragging
 
+    // () ...
+    
+
+    if (canDragWindow) { 
+        // we're actually dragging now !!
+        const { top, left } = focusedWindow.getBoundingClientRect();
+        const { movementX, movementY } = e;
+
+        focusedWindow.style.top = `${top + movementY}px`;
+        focusedWindow.style.left = `${left + movementX}px`;
+    }
 
 
 });
+
+document.addEventListener('mouseup', (e) => {
+    if (canDragWindow) {
+        // end the drag state 
+        canDragWindow = false;
+    }
+});
+
+
+
+
+// just for debug ----------------------------------
+document.addEventListener('mouseover', (e) => {
+    $('#log').innerText = `${e.target.tagName}: #${e.target.id}, [${e.target.className}]`;
+});
+document.addEventListener('mousemove', (e) => {
+    // log the contents
+
+    // make a new arr and remove -1 from it
+    const newarr = [...winMap.get('__order')];
+    newarr.splice(newarr.indexOf(-1), 1);
+
+    // { <pid>: { title: <string>, obj: <Element>, parent: <pid>, children: [<pid>*], rect: [left, right + 12, top, bottom + 46] } }
+    $('#ws').innerText = '';
+        for (let i = 0; i < newarr.length; i++) {
+            const pid = newarr[i]
+            const { title, obj, parent, children, rect } = winMap.get(pid);
+            $('#ws').innerText += `\n{ ${pid}: { title: ${title}, obj: ..., parent: ${parent}, children: ${children}, rect: [${rect[0]}, ${rect[1]}, ${rect[2]}, ${rect[3]}] } }`;
+            console.log(title, rect);
+        }
+})
+
+// -------------------------------------------------
