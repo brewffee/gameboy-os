@@ -12,7 +12,7 @@
     <body class="desktop" id="0" style="background:#7c6d80;">
         <button onclick="createWindow('default', { title: 'test', size: '200x200', pos: '128,128', img: 'tesst.png', buttons: [1,2,3], html: '<span>real</span>' })">Create Window</button>
 
-        <window pid="1" name="Log" active="false" style="top: 36px; left: 16px; z-index: 100; height: 180px; width: 812px;">
+        <window pid="1" name="Log" active="false" style="top: 36px; left: 16px; height: 180px; width: 812px;">
             <titlebar> <!-- pos: 0x 0y, 100%w, 26h -->
                 <img class="titlebar-icon" src="tesst.png" />
                 <span class="titlebar-title">Log</span>
@@ -23,13 +23,14 @@
                 </div>
             </titlebar>
             <content> <!-- pos: 30x 0y, 100%w, 100% - 26h -->
-                <span id="log">howdy</span>
-                <span id="focused">null</span>
+                <span id="log">Nothing to report!</span>
+                <span id="focused"></span>
+                <span id="tb"></span>
             </content>
         </window>
 
 
-        <window pid="2" name="LogTwo" active="false" style="top:128px; left: 36px; z-index: 98; height: 180px; width: 812px;">
+        <window pid="2" name="LogTwo" active="false" style="top:128px; left: 36px; height: 180px; width: 812px;">
             <titlebar> <!-- pos: 0x 0y, 100%w, 26h -->
                 <img class="titlebar-icon" src="tesst.png" />
                 <span class="titlebar-title">Log</span>
@@ -40,9 +41,10 @@
                 </div>
             </titlebar>
             <content> <!-- pos: 30x 0y, 100%w, 100% - 26h -->
-                <span id="log">howdy</span>
-                <span id="focused">null</span>
-            </content>
+                <span id="log">Nothing to report!</span>
+                <span id="focused"></span>
+                <span id="tb"></span>
+                </content>
         </window>
 
         <div class="taskbar taskbar-obj" style="height: 24px; width: 100%; position:absolute; bottom: 0px;display: flex;">

@@ -1,5 +1,6 @@
 const $ = (selector) => document.querySelector(selector);
 const __getName = (elm) => elm.getAttribute('name');
+const __getPid = (elm) => elm.getAttribute('pid');
 
 
 document.oncontextmenu = () => false;
@@ -20,13 +21,46 @@ let winMap = new Map();
 // { 13: { title: 'Properties - New Folder', obj: ..., parent: 12, children: [], rect: [...] } }
 // { 14: { title: 'Console', obj: ..., parent: -1, children: [], rect: [...] } }
 // { 15: { title: 'Preferences', obj: ..., parent: 12, children: [], rect: [...] } }
+// .. and so on
+
+// also add an array to help us keep track of the order of the windows
+winMap.set('__order', []);
+
+// Usually we store windows when they're created, but we're not quite there
+// Just add the pre-initialized windows to the map
+window.onload = () => {
+    const windows = document.querySelectorAll('window');
+    for (let i = 0; i < windows.length; i++) {
+        const title = __getName(windows[i]);
+        const pid = __getPid(windows[i]);
+        const parent = -1; // parent of the desktop is -1
+        const children = []; // not implemented
+
+        const { left, top, right, bottom } = windows[i].getBoundingClientRect();
+        const rect = [left, right + 12, top, bottom + 46];
+
+        winMap.set(pid, { title, obj: windows[i], parent, children, rect });
+
+        // the window won't be in the order already, so we can add it w/ no issue
+        winMap.get('__order').push(pid);
+
+        // set the z-index of the window to be the same as its index in the order array
+        windows[i].style.zIndex = 100 - winMap.get('__order').indexOf(pid);
+    }
+
+    console.log(winMap);
+
+    // add '-1', representing the desktop, to the order array
+    // desktop has special ordering rules, it can only be at the beginning or end of the order array
+    winMap.get('__order').push(-1);
+}
+
 
 document.addEventListener('mousedown', (e) => {
     // ALL OF THESE FOCUS ON A WINDOW 
 
     // use coordinates to find the window
     
-
     // get every <window>
     const windows = document.querySelectorAll('window');
 
@@ -72,14 +106,74 @@ document.addEventListener('mousedown', (e) => {
         focusedWindow.setAttribute('active', 'true');
         $('#focused').innerText = `\nFocused on window: ${__getName(focusedWindow)}`;
    
-        // we also need to unfocus the last window we were on before
-        // (unless this is the same window)
+        // update the order of the windows
+        const pid = __getPid(focusedWindow);
+        const index = winMap.get('__order').indexOf(pid);
         
+        // if -1 is at the front, then we need to move it to the end
+        let wasDesktop = false; // for window states later
+        if (winMap.get('__order')[0] === -1) {
+            wasDesktop = true;
+            winMap.get('__order').splice(0, 1);
+            winMap.get('__order').push(-1);
+        }
+
+        // and if we're already at the beginning, then we don't need to do anything
+        if (index !== 0) {
+            const order = [...winMap.get('__order')];
+            
+            // move to front 
+            order.splice(0, 0, ...order.splice(index, 1));
+            winMap.set('__order', order);
+        }
+
+        // now that order is updated, we can update the z-index and the color of the last window, if it wasn't the desktop
+        if (!wasDesktop) {
+            // set the active attribute on the last window
+            const lastWindow = winMap.get(winMap.get('__order')[1]).obj;
+            lastWindow.setAttribute('active', 'false');
+
+            // set the z-index of every other tem
+            for (let i = 0; i < winMap.get('__order').length - 1; i++) {
+                const pid = winMap.get('__order')[i];
+                console.log(pid);
+                const window = winMap.get(winMap.get('__order')[i]).obj;
+                window.style.zIndex = 100 - i;
+            }
+        }
+
+        // we clicked on a window? cool
+        // what did we click tho? the titlebar or its content?
+        console.log(e.target.className);
+        if (e.target.className.startsWith('titlebar') || e.target.tagName === 'TITLEBAR') {
+            // clicked on the titlebar, we have access to titlebar-specific functions
+            const titlebar = e.target;
+            while (!titlebar.tagName === 'TITLEBAR') {
+                titlebar = titlebar.parentElement;
+            }
+
+            $('#tb').innerText = `\nTitlebar selected, mouse button: ${e.button}`;
+        } else {
+            $('#tb').innerText = ``;
+        }
+        console.log(winMap);        
     } else {
-        focusedWindow = null;
         // we're on the desktop then
+        focusedWindow = null;        
         $('#focused').innerText = `\nFocused on the desktop`;
+        
+        const order = [...winMap.get('__order')];
+        
+        // move the -1 to the front of the order array
+        order.splice(0, 0, ...order.splice(order.length - 1, 1));
+        winMap.set('__order', order);
+
+        // mark the last window as inactive
+        const lastWindow = winMap.get(winMap.get('__order')[1]).obj;
+        lastWindow.setAttribute('active', 'false');
     }
+
+
 
 
 });
