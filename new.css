@@ -32,7 +32,7 @@ titlebar {
     background-color: #7c6d80;
     
     /* never fucking mind it just works here somehow */
-    border-image: url(winnew/titlebar.png) 3 3 3 3 repeat repeat;
+    border-image: url(winnew/titlebar-l.png) 3 3 3 3 repeat repeat;
     border-style: solid;
     border-width: 6;
     border-radius: 12px; /* hides bg corner overlap :3 */
@@ -144,7 +144,7 @@ content {
     
     background-color: #7c6d80;
     
-    border-image: url(winnew/content.png) 5 repeat repeat;
+    border-image: url(winnew/content-l.png) 5 repeat repeat;
     border-style: solid;
     border-width: 10;
     border-radius: 12px;
@@ -157,3 +157,5 @@ window[active="true"] > content {
     border-width: 10;
     border-radius: 12px;
 }
+
+
