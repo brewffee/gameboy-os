@@ -6,6 +6,7 @@ document.oncontextmenu = () => false;
 
 let focusedWindow = null; // if null, then we're focused on the desktop
 let canDragWindow = false; // check if we're allowed to drag the window
+let isDesktop = true; // ignore all window rules if we're on the desktop
 
 // now we can make a window manager
 let winMap = new Map();
@@ -44,13 +45,17 @@ window.onload = () => {
 
     console.log(winMap);
 
-    // add '-1', representing the desktop, to the order array
-    // desktop has special ordering rules, it can only be at the beginning or end of the order array
-    winMap.get('__order').push(-1);
+    // we're on the desktop
+    isDesktop = true;
 }
 
 
 document.addEventListener('mousedown', (e) => {
+    // if we click the desktop and are already there then no need to do anything
+    if (e.target.tagName === 'BODY' && isDesktop) {
+        return;
+    }
+
     // ALL OF THESE FOCUS ON A WINDOW 
 
     // use coordinates to find the window
@@ -72,7 +77,8 @@ document.addEventListener('mousedown', (e) => {
         }
     }    
 
-    if (windowFound) {
+   
+    if (windowFound) {        
         console.log('found windows: ', foundWindows);
         // check the length (may be multiple windows)
         if (foundWindows.length > 1) {
@@ -103,14 +109,6 @@ document.addEventListener('mousedown', (e) => {
         // update the order of the windows
         const pid = __getPid(focusedWindow);
         const index = winMap.get('__order').indexOf(pid);
-        
-        // if -1 is at the front, then we need to move it to the end
-        let wasDesktop = false; // for window states later
-        if (winMap.get('__order')[0] === -1) {
-            wasDesktop = true;
-            winMap.get('__order').splice(0, 1);
-            winMap.get('__order').push(-1);
-        }
 
         // and if we're already at the beginning, then we don't need to do anything
         if (index !== 0) {
@@ -122,17 +120,29 @@ document.addEventListener('mousedown', (e) => {
         }
 
         // now that order is updated, we can update the z-index and the color of the last window, if it wasn't the desktop
-        if (!wasDesktop) {
+        if (!isDesktop) {
             // set the active attribute on the last window
             const lastWindow = winMap.get(winMap.get('__order')[1]).obj;
             lastWindow.setAttribute('active', 'false');
 
             // set the z-index of every other tem
-            for (let i = 0; i < winMap.get('__order').length - 1; i++) {
+            for (let i = 0; i < winMap.get('__order').length; i++) {
                 const pid = winMap.get('__order')[i];
                 console.log(pid);
                 const window = winMap.get(winMap.get('__order')[i]).obj;
                 window.style.zIndex = 100 - i;
+            }
+        } else {
+            // set our z-index
+            focusedWindow.style.zIndex = 101;
+
+            // and move the others back
+            for (let i = 0; i < winMap.get('__order').length; i++) {
+                const pid = winMap.get('__order')[i];
+                if (pid !== pid) {
+                    const window = winMap.get(winMap.get('__order')[i]).obj;
+                    window.style.zIndex = 100 - i;
+                }
             }
         }
 
@@ -154,20 +164,18 @@ document.addEventListener('mousedown', (e) => {
         } else {
             $('#tb').innerText = ``;
         }
-        console.log(winMap);        
+        console.log(winMap);
+
+        // we're done, we can reset isDesktop
+        isDesktop = false;
     } else {
         // we're on the desktop then
         focusedWindow = null;        
+        isDesktop = true;
         $('#focused').innerText = `\nFocused on the desktop`;
-        
-        const order = [...winMap.get('__order')];
-        
-        // move the -1 to the front of the order array
-        order.splice(0, 0, ...order.splice(order.length - 1, 1));
-        winMap.set('__order', order);
 
         // mark the last window as inactive
-        const lastWindow = winMap.get(winMap.get('__order')[1]).obj;
+        const lastWindow = winMap.get(winMap.get('__order')[0]).obj;
         lastWindow.setAttribute('active', 'false');
     }
 });
@@ -209,21 +217,18 @@ document.addEventListener('mouseup', (e) => {
 document.addEventListener('mouseover', (e) => {
     $('#log').innerText = `${e.target.tagName}: #${e.target.id}, [${e.target.className}]`;
 });
-document.addEventListener('mousemove', (e) => {
-    // log the contents
 
-    // make a new arr and remove -1 from it
+
+setInterval(() => {
     const newarr = [...winMap.get('__order')];
-    newarr.splice(newarr.indexOf(-1), 1);
 
     // { <pid>: { title: <string>, obj: <Element>, parent: <pid>, children: [<pid>*], rect: [left, right + 12, top, bottom + 46] } }
-    $('#ws').innerText = '';
+    $('#ws').innerText = winMap.get('__order').join(', ') + ' isDesktop: ' + isDesktop;
         for (let i = 0; i < newarr.length; i++) {
             const pid = newarr[i]
             const { title, obj, parent, children, rect } = winMap.get(pid);
             $('#ws').innerText += `\n{ ${pid}: { title: ${title}, obj: ..., parent: ${parent}, children: ${children}, rect: [${rect[0]}, ${rect[1]}, ${rect[2]}, ${rect[3]}] } }`;
-            console.log(title, rect);
         }
-})
+} , 30);
 
 // -------------------------------------------------
