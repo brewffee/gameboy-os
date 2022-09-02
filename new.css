@@ -13,12 +13,24 @@ body {
     cursor: url(cursors/default.png), auto;
     height: 100vh;
     margin: 0;
+    overflow: hidden;
 }
 
 window {
     position: absolute;
-
 }
+
+handle {
+    position: absolute;
+    width: calc(100% + 4px + 12px); /* offset by 12px since window size isnt exact */
+    height: calc(100% + 4px + 46px);
+    top: -2px;
+    left: -2px;
+    z-index: 80;
+    border : 2px solid #000;
+    background: none;
+}
+
 
 
 /* Disabled/Default */ 
@@ -57,16 +69,18 @@ titlebar > img /* window icon */ {
 
 /* Disabled/Default */
 titlebar > span /* window title */ {
+    margin-bottom: -4px;
     margin-top: -3px;
+
     display: block;
 
     color: #c7c6c6;
-    text-shadow: 2px 2px 0px #000;
+    text-shadow: 2px 2px 0px #382843;
 }
 
 /* Active Changes */
 window[active="true"] > titlebar > span {
-    text-shadow: 2px 2px 0px #382843;
+    text-shadow: 2px 2px 0px #000;
 }
 
 /* Default */

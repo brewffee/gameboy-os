@@ -52,7 +52,7 @@ window.onload = () => {
 
 document.addEventListener('mousedown', (e) => {
     // if we click the desktop and are already there then no need to do anything
-    if (e.target.tagName === 'BODY' && isDesktop) {
+    if ((e.target.tagName === 'BODY' && isDesktop) || e.target.tagName === 'HANDLE') {
         return;
     }
 
@@ -77,20 +77,19 @@ document.addEventListener('mousedown', (e) => {
         }
     }    
 
-   
     if (windowFound) {        
         console.log('found windows: ', foundWindows);
         // check the length (may be multiple windows)
-        if (foundWindows.length > 1) {
-
+        if (foundWindows) {
             // find window with the highest z-index, and grab that one
             let closestWindow = null;
             let closestZIndex = 0;
             for (let i = 0; i < foundWindows.length; i++) {
+                console.log('Testing if ' + foundWindows[i].style.zIndex + ' is greater than ' + closestZIndex + ': ' + (foundWindows[i].style.zIndex > closestZIndex));
                 if (i === 0) {
                     closestWindow = foundWindows[i];
                     closestZIndex = parseInt(foundWindows[i].style.zIndex);
-                } else if (parseInt(foundWindows[i].style.zIndex > closestZIndex)) {
+                } else if (parseInt(foundWindows[i].style.zIndex) > closestZIndex) {
                     console.log(parseInt(foundWindows[i].style.zIndex) + ' > ' + closestZIndex);
                     closestWindow = foundWindows[i];
                     closestZIndex = parseInt(foundWindows[i].style.zIndex);
@@ -119,33 +118,12 @@ document.addEventListener('mousedown', (e) => {
             winMap.set('__order', order);
         }
 
-        // now that order is updated, we can update the z-index and the color of the last window, if it wasn't the desktop
+        // now that order is updated, we can update the color of the last window, if it wasn't the desktop
         if (!isDesktop) {
             // set the active attribute on the last window
             const lastWindow = winMap.get(winMap.get('__order')[1]).obj;
             lastWindow.setAttribute('active', 'false');
-
-            // set the z-index of every other tem
-            for (let i = 0; i < winMap.get('__order').length; i++) {
-                const pid = winMap.get('__order')[i];
-                console.log(pid);
-                const window = winMap.get(winMap.get('__order')[i]).obj;
-                window.style.zIndex = 100 - i;
-            }
-        } else {
-            // set our z-index
-            focusedWindow.style.zIndex = 101;
-
-            // and move the others back
-            for (let i = 0; i < winMap.get('__order').length; i++) {
-                const pid = winMap.get('__order')[i];
-                if (pid !== pid) {
-                    const window = winMap.get(winMap.get('__order')[i]).obj;
-                    window.style.zIndex = 100 - i;
-                }
-            }
         }
-
         // we clicked on a window? cool
         // what did we click tho? the titlebar or its content?
         console.log(e.target.className);
@@ -160,11 +138,19 @@ document.addEventListener('mousedown', (e) => {
             if (e.button === 0) {
                 canDragWindow = true; // for the mousemove event
             }
+
             $('#tb').innerText = `\nTitlebar selected, mouse button: ${e.button}`;
         } else {
             $('#tb').innerText = ``;
         }
         console.log(winMap);
+
+        // set all z-indexes to be the same as their index in the order array
+        for (let i = 0; i < winMap.get('__order').length; i++) {
+            const pid = winMap.get('__order')[i];
+            const win = winMap.get(pid).obj;
+            win.style.zIndex = 100 - i;
+        }
 
         // we're done, we can reset isDesktop
         isDesktop = false;
@@ -181,15 +167,12 @@ document.addEventListener('mousedown', (e) => {
 });
 
 document.addEventListener('mousemove', (e) => {
-    // we'll need to add a check if its actually the resize state
-    // instead of the drag state
-    
-    // check if we're on the last 4 pixels of a window
-    // if we're on those pixels, we can set the cursor to resize (direction)
-    // if we are using lmb, we are definitely resizing, and not dragging
-
-    // () ...
-    
+    // DISCARD THIS HANDLE STUFF !!! CHANGING HOW WE'RE DOING THIS LATER
+    if (canResizeWindow && e.buttons === 1 && e.target.tagName === 'HANDLE') {
+        console.log('resizing window');
+        // move focus to external function and call it here
+        // also get the window object and keep it in a variable until mouseup
+    }
 
     if (canDragWindow) { 
         // we're actually dragging now !!
@@ -199,9 +182,32 @@ document.addEventListener('mousemove', (e) => {
         focusedWindow.style.top = `${top + movementY}px`;
         focusedWindow.style.left = `${left + movementX}px`;
     }
-
-
 });
+
+let canResizeWindow = false;
+document.addEventListener('mouseover', (e) => {
+    // check if we're on a <handle>
+    console.log(e.target.className);
+    if (e.target.tagName === "HANDLE") {
+        canResizeWindow = true;
+        // change cursor
+        console.log('changing cursor');
+        document.body.style.cursor = 'pointer';
+    } 
+    // if we're on those pixels, we can set the cursor to resize (direction)
+    // if we are using lmb, we are definitely resizing, and not dragging
+});
+
+document.addEventListener('mouseout', (e) => {
+    if (canResizeWindow) {
+        canResizeWindow = false;
+        document.body.style.cursor = 'default';
+    }
+} );
+
+
+    
+
 
 document.addEventListener('mouseup', (e) => {
     if (canDragWindow) {

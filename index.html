@@ -27,13 +27,20 @@
                 <span id="focused"></span>
                 <span id="tb"></span>
             </content>
+            <handleGroup> <!-- required to allow dragging to work-->
+                <handle dir="left"></handle>    <!-- edge handle -->
+                <handle dir="right"></handle>   <!-- edge handle -->
+                <handle dir="top"></handle>     <!-- edge handle -->
+                <handle dir="bottom"></handle>  <!-- edge handle -->
+                <handle dir="corners"></handle> <!-- corner handle, testing how its going to work later -->
+            </handleGroup>
         </window>
 
 
         <window pid="2" name="LogTwo" active="false" style="top:128px; left: 36px; height: 180px; width: 812px;">
             <titlebar> <!-- pos: 0x 0y, 100%w, 26h -->
-                <img class="titlebar-icon" src="tesst.png" draggable="false"/>
-                <span class="titlebar-title">Log</span>
+                <!--<img class="titlebar-icon" src="tesst.png" draggable="false"/>-->
+                <span class="titlebar-title">Processes</span>
                 <div class="titlebar-buttons">
                     <button class="titlebar-button" type="minimize"></button>
                     <button class="titlebar-button" type="maximize"></button>
