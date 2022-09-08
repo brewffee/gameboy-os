@@ -71,7 +71,7 @@ document.addEventListener('mousedown', (e) => {
         const rect = win.getBoundingClientRect();
 
         // we need to add to right and bottom since window's rect doesnt fully contain the window :/
-        if (e.clientX >= rect.left && e.clientX <= rect.right + 12 && e.clientY >= rect.top && e.clientY <= rect.bottom + 46) {
+        if (e.pageX >= rect.left && e.pageX <= rect.right + 12 && e.pageY >= rect.top && e.pageY <= rect.bottom + 46) {
             windowFound = true;
             foundWindows.push(win);
         }
@@ -167,13 +167,6 @@ document.addEventListener('mousedown', (e) => {
 });
 
 document.addEventListener('mousemove', (e) => {
-    // DISCARD THIS HANDLE STUFF !!! CHANGING HOW WE'RE DOING THIS LATER
-    if (canResizeWindow && e.buttons === 1 && e.target.tagName === 'HANDLE') {
-        console.log('resizing window');
-        // move focus to external function and call it here
-        // also get the window object and keep it in a variable until mouseup
-    }
-
     if (canDragWindow) { 
         // we're actually dragging now !!
         const { top, left } = focusedWindow.getBoundingClientRect();
@@ -185,17 +178,103 @@ document.addEventListener('mousemove', (e) => {
 });
 
 let canResizeWindow = false;
-document.addEventListener('mouseover', (e) => {
-    // check if we're on a <handle>
-    console.log(e.target.className);
-    if (e.target.tagName === "HANDLE") {
-        canResizeWindow = true;
-        // change cursor
-        console.log('changing cursor');
-        document.body.style.cursor = 'pointer';
-    } 
-    // if we're on those pixels, we can set the cursor to resize (direction)
-    // if we are using lmb, we are definitely resizing, and not dragging
+
+document.addEventListener('mousemove', (e) => {
+    // if the target is a <window> check what position of that element we're on
+    if (e.target.tagName === 'WINDOW') {
+        // where is the mouse, and where is the window??
+        const { pageX, pageY } = e;
+        const { top, left, right, bottom, width, height } = e.target.getBoundingClientRect();
+
+        // do some math to figure out where the mouse is
+        const x = pageX - left;
+        const y = pageY - top;
+
+        console.log('x: ' + x + ', y: ' + y);
+
+        // if either is negative, then we're on its top or left border
+        // if either is greater than the width/height, then we're on its bottom or right border
+        // if two conditions are met, we're on the corner
+        if (x < 0 && y < 0 || x < 0 && y > (bottom - top) || x > (right - left) && y < 0 || x > (right - left) && y > (bottom - top)) {
+            // we're on the corner, we can resize
+            canResizeWindow = true;
+            console.log('corner resizing is allowed');
+        } else if (x < 0 || y < 0 || x > (right - left) || y > (bottom - top)) {
+            // we're on the border, we can resize
+            canResizeWindow = true;
+            console.log('resizing is allowed');
+        }
+
+        // change cursors depending on condition
+        // (!) corners might need their values to be a little bigger ??
+        //     top left: x < 0 && y < 0 
+        //     top right: x > (right - left) && y < 0
+        //     bottom left: x < 0 && y > (bottom - top)
+        //     bottom right: x > (right - left) && y > (bottom - top)
+        //
+        //     top: x > 0 && x < (right - left) && y < 0
+        //     bottom: x > 0 && x < (right - left) && y > (bottom - top)
+        //     left: x < 0 && y > 0 && y < (bottom - top)
+        //     right: x > (right - left) && y > 0 && y < (bottom - top)
+        
+        let cursor;
+        let dir = cursor;
+        if (x < 0 && y < 0) cursor = 'nw-resize';
+        else if (x < 0 && y > (bottom - top)) cursor = 'sw-resize';
+        else if (x > (right - left) && y < 0) cursor = 'ne-resize';
+        else if (x > (right - left) && y > (bottom - top)) cursor = 'se-resize';
+        // ---------------
+        else if (x > 0 && x < (right - left) && y < 0) cursor = 'n-resize';
+        else if (x > 0 && x < (right - left) && y > (bottom - top)) cursor = 's-resize';
+        else if (x < 0 && y > 0 && y < (bottom - top)) cursor = 'w-resize';
+        else if (x > (right - left) && y > 0 && y < (bottom - top)) cursor = 'e-resize';
+        else cursor = 'default';
+
+        // there will be a function that handles cursor names later, but rn use default css cursor
+        document.body.style.cursor = cursor;
+
+        // if we click, pass to next if statement
+        if (e.buttons === 1) {
+            dragging = winMap.get(__getPid(e.target)).obj;
+            focusedWindow = dragging;
+
+        }
+    }
+
+    // we can resize until we mouseup
+    // isDragging = true; // for global scope
+    // top left: +width +height , -top -left
+    // top right: +width +height, -top 
+    // bottom left: +width +height, -left
+    // bottom right: +width +height
+    //
+    // top: +height, -top
+    // bottom: +height
+    // left: +width, -left
+    // right: +width
+
+    if (e.buttons === 1 && canResizeWindow) {
+        // isDragging = true;
+        let { obj } = winMap.get(__getPid(e.target));
+        // dragWindow = obj; // pass to mous
+        // start the hell that is this fucking statement
+
+        // corners (actions with two directions)
+        if (cursor === 'nw-resize') { // top left
+            // update horizontally (cannot go below 192px)
+            if (!(height + (left - pageX) <= 192)) {
+                obj.style.width = `${width + (left - pageX)}px`;
+                obj.style.left = `${pageX}px`;
+            }
+
+            // update vertically (cannot go below 72px)
+            if (!(height + (top - pageY) <= 72)) {
+                obj.style.height = `${height + (top - pageY)}px`;
+                obj.style.top = `${pageY}px`;
+            }
+        }
+        
+    }
 });
 
 document.addEventListener('mouseout', (e) => {

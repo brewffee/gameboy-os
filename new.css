@@ -20,26 +20,13 @@ window {
     position: absolute;
 }
 
-handle {
-    position: absolute;
-    width: calc(100% + 4px + 12px); /* offset by 12px since window size isnt exact */
-    height: calc(100% + 4px + 46px);
-    top: -2px;
-    left: -2px;
-    z-index: 80;
-    border : 2px solid #000;
-    background: none;
-}
-
-
-
 /* Disabled/Default */ 
 titlebar {
     position: relative;
     top: 0; left: 0;
     
     display: flex;
-    width: 100%; height: 14px;
+    width: calc(100% - 12px); height: 14px;
 
     background-color: #7c6d80;
     
@@ -150,11 +137,8 @@ window[active="true"] > titlebar > .titlebar-buttons > .titlebar-button[type="re
 
 /* Default */
 content {
-    position: relative;
-    top: 0; left: 0;
-    
     display: block;
-    width: calc(100% - 8px); height: 100%;
+    width: calc(100% - 20px); height: calc(100% - 46px);
     
     background-color: #7c6d80;
     
@@ -172,4 +156,11 @@ window[active="true"] > content {
     border-radius: 12px;
 }
 
-
+window::before {
+    content: "";
+    position: absolute;
+    top: -4px; left: -4px;
+    width: calc(100% + 8px); height: calc(100% + 8px);
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
